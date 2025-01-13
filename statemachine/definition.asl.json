@@ -1,0 +1,109 @@
+{
+  "Comment": "AWS Step Functions workflow for video generation",
+  "StartAt": "InputParser",
+  "States": {
+    "InputParser": {
+      "Type": "Task",
+      "Resource": "${InputParserFunctionArn}",
+      "Parameters": {
+        "executionId.$": "$$.Execution.Id",
+        "prompt.$": "$.prompt"
+      },
+      "ResultPath": "$",
+      "Catch": [
+        {
+          "ErrorEquals": ["States.ALL"],
+          "ResultPath": "$.error",
+          "Next": "FailState"
+        }
+      ],
+      "Next": "CreateTask"
+    },
+    "FailState": {
+      "Type": "Fail",
+      "Error": "InputParserError",
+      "Cause": "Error occurred in input parser"
+    },
+    "CreateTask": {
+      "Type": "Task",
+      "Resource": "${CreateTaskFunctionArn}",
+      "Next": "ParallelProcessing"
+    },
+    "ParallelProcessing": {
+      "Type": "Parallel",
+      "ResultSelector": {
+        "taskId.$": "$[0].taskId"
+      },
+      "ResultPath": "$",
+      "Branches": [
+        {
+          "StartAt": "ImageGenerator",
+          "States": {
+            "ImageGenerator": {
+              "Type": "Task",
+              "Resource": "${ImageGeneratorFunctionArn}",
+              "Next": "VideoGenerator"
+            },
+            "VideoGenerator": {
+              "Type": "Task",
+              "Resource": "${VideoGeneratorFunctionArn}",
+              "End": true
+            }
+          }
+        },
+        {
+          "StartAt": "SpeechGenerator",
+          "States": {
+            "SpeechGenerator": {
+              "Type": "Task",
+              "Resource": "${SpeechGeneratorFunctionArn}",
+              "End": true
+            }
+          }
+        }
+      ],
+      "Next": "TaskStatusChecker"
+    },
+    "TaskStatusChecker": {
+      "Type": "Task",
+      "Resource": "${TaskStatusCheckerFunctionArn}",
+      "Next": "CheckStatus"
+    },
+    "CheckStatus": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Variable": "$.status",
+          "StringEquals": "COMPLETED",
+          "Next": "VideoSynthesizer"
+        },
+        {
+          "Variable": "$.status",
+          "StringEquals": "FAILED",
+          "Next": "FailState"
+        },
+        {
+          "Variable": "$.status",
+          "StringEquals": "PARTIAL_COMPLETED",
+          "Next": "FailState"
+        },
+        {
+          "Variable": "$.status",
+          "StringEquals": "IN_PROGRESS",
+          "Next": "Wait"
+        }
+      ],
+      "Default": "TaskStatusChecker"
+    },
+    "Wait": {
+      "Type": "Wait",
+      "Seconds": 30,
+      "Next": "TaskStatusChecker"
+    },
+    "VideoSynthesizer": {
+      "Type": "Task",
+      "Resource": "${VideoSynthesizerFunctionArn}",
+      "End": true
+    }
+  }
+}

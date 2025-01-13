@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Generator</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Video Generator</h1>
+        
+        <div class="input-section">
+            <label for="userInput">输入您的句诗：</label>
+            <textarea id="userInput" rows="4" placeholder="this is an input window"></textarea>
+            <button id="submitBtn" class="submit-btn">提交</button>
+        </div>
+
+        <div class="query-section">
+            <label for="taskId">任务ID：</label>
+            <div class="query-input">
+                <input type="text" id="taskId" placeholder="输入任务ID">
+                <button id="queryBtn" class="query-btn">查询</button>
+            </div>
+        </div>
+
+        <div class="task-section">
+            <h2>任务进度</h2>
+            <table id="taskTable">
+                <thead>
+                    <tr>
+                        <th>镜头</th>
+                        <th>内容</th>
+                        <th>语音生成</th>
+                        <th>场景图片</th>
+                        <th>视频</th>
+                        <th>任务重试</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>scene0</td>
+                        <td>text</td>
+                        <td>audio URI</td>
+                        <td>Image URI</td>
+                        <td>video URI</td>
+                        <td><button class="retry-btn">button</button></td>
+                    </tr>
+                    <tr>
+                        <td>scene1</td>
+                        <td>text</td>
+                        <td>audio URI</td>
+                        <td>Image URI</td>
+                        <td>video URI</td>
+                        <td><button class="retry-btn">button</button></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- <div class="action-section">
+            <button id="generateFinalBtn" class="generate-final-btn">生成最终视频</button>
+        </div> -->
+
+        <div class="result-section">
+            <h2>成片：</h2>
+            <div id="resultUrl">s3 url from DDB with query result: taskid + scene0 + final_output</div>
+        </div>
+    </div>
+    <script src="https://sdk.amazonaws.com/js/aws-sdk-2.1467.0.min.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
