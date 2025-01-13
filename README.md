@@ -24,29 +24,13 @@ The solution uses:
 
 ## Deployment Steps
 
-1. Install dependencies for each Lambda function:
+To deploy the application:
 ```bash
-# Create and activate a virtual environment
-python -m venv .venv
-source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+# Make the script executable
+chmod +x deploy.sh
 
-# Install dependencies for each function
-cd input\ parser && pip install -r requirements.txt && cd ..
-cd create\ task && pip install -r requirements.txt && cd ..
-cd image\ generator && pip install -r requirements.txt && cd ..
-cd speech\ generator && pip install -r requirements.txt && cd ..
-cd video\ generator && pip install -r requirements.txt && cd ..
-cd task\ status\ checker && pip install -r requirements.txt && cd ..
-cd video\ synthesizer && pip install -r requirements.txt && cd ..
-```
-
-2. Build and deploy using SAM:
-```bash
-# Build
-sam build
-
-# Deploy
-sam deploy --guided
+# Run the deployment script
+./deploy.sh
 ```
 
 During the guided deployment, you'll need to:
@@ -55,7 +39,7 @@ During the guided deployment, you'll need to:
 - Confirm IAM role creation
 - Allow SAM CLI to create named resources
 
-3. After deployment, SAM will output:
+After deployment, SAM will output:
 - API Gateway endpoint URL
 - Step Functions state machine ARN
 
